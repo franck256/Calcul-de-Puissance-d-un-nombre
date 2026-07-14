@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement : Les 4 Opérations Décimales</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #2c3e50;
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            background: white;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-size: 2.2em;
+        }
+        .step-panel {
+            display: none;
+        }
+        .step-panel.active {
+            display: block;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        input[type="text"] {
+            border: 3px solid #bdc3c7;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+        }
+        
+        .consigne {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.5;
+            background: #eef2f7;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        /* ÉNONCÉ GÉANT */
+        .expression-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 35px 0;
+            font-size: 4em;
+            font-weight: bold;
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px dashed #cbd5e1;
+            color: #1e293b;
+        }
+
+        .expression-container .symbol {
+            color: #3498db;
+            margin: 0 25px;
+        }
+        
+        /* ZONE DE RÉPONSE */
+        .answer-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin: 40px 0;
+        }
+        .input-answer {
+            width: 280px;
+            height: 70px;
+            font-size: 2.5em !important;
+            font-weight: bold;
+            text-align: center;
+            border-width: 3px !important;
+            border-color: #3498db !important;
+        }
+        
+        /* Boutons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        button.action-btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-start { background-color: #3498db; color: white; width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.2em;}
+        .btn-start:hover { background-color: #2980b9; }
+        .btn-submit { background-color: #2ecc71; color: white; }
+        .btn-submit:hover { background-color: #27ae60; }
+        .btn-skip { background-color: #94a3b8; color: white; }
+        .btn-skip:hover { background-color: #64748b; }
+        
+        /* Progression */
+        .progress-bar {
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            height: 12px;
+            margin: 25px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background-color: #3498db;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .indicator {
+            text-align: right;
+            font-size: 1.1em;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .result-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 6px solid #3498db;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        
+        /* Tableau final */
+        table.bilan {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+        table.bilan th, table.bilan td {
+            border: 1px solid #cbd5e1;
+            padding: 14px;
+            text-align: center;
+        }
+        table.bilan th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .row-correct { background-color: #dcfce7; color: #14532d; }
+        .row-incorrect { background-color: #fee2e2; color: #7f1d1d; }
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        .badge-success { background-color: #2ecc71; color: white; }
+    </style>
+</head>
+<body>
+
+    <h1>Entraînement : Les 4 Opérations Décimales</h1>
+
+    <!-- ÉTAPE 1 : Inscription -->
+    <div id="panel-login" class="step-panel active">
+        <label for="student-name">Prénom et Nom de l'élève :</label>
+        <div style="margin-bottom: 20px;">
+            <input type="text" id="student-name" style="width:100%; height:50px; font-size:1.2em; padding:10px; box-sizing:border-box;" placeholder="Ex: Lucas Simon">
+        </div>
+        <button class="btn-start" onclick="startTest()">Commencer l'entraînement (10 questions)</button>
+    </div>
+
+    <!-- ÉTAPE 2 : Exercices -->
+    <div id="panel-quiz" class="step-panel">
+        <div class="indicator">Question <span id="current-q">1</span> / 10</div>
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        
+        <div class="consigne" id="q-consigne">...</div>
+        
+        <div class="expression-container" id="q-expression-container"></div>
+        
+        <div class="answer-zone">
+            <label id="label-reponse" for="ans-value" style="font-size: 1.3em;">Écris ta réponse ci-dessous :</label>
+            <input type="text" id="ans-value" class="input-answer" placeholder="0,00" autocomplete="off">
+        </div>
+        
+        <div class="btn-group">
+            <button class="action-btn btn-skip" onclick="skipQuestion()">Passer</button>
+            <button class="action-btn btn-submit" onclick="submitAnswer()">Valider la réponse</button>
+        </div>
+    </div>
+
+    <!-- ÉTAPE 3 : Bilan -->
+    <div id="panel-results" class="step-panel">
+        <div class="result-box">
+            <p><strong>Élève :</strong> <span id="res-name">...</span></p>
+            <p><strong>Score :</strong> <span id="res-grade" style="font-size: 2.5em; color: #27ae60; font-weight: bold;">0 / 10</span></p>
+        </div>
+
+        <h3 style="margin-top:30px; color:#2c3e50; border-bottom:3px solid #cbd5e1; padding-bottom:8px; font-size:1.4em;">Correction détaillée</h3>
+        <table class="bilan">
+            <thead>
+                <tr>
+                    <th>Type d'opération</th>
+                    <th>Opération posée</th>
+                    <th>Ta réponse</th>
+                    <th>Correction</th>
+                </tr>
+            </thead>
+            <tbody id="bilan-table-body">
+            </tbody>
+        </table>
+
+        <button class="btn-start" style="margin-top: 40px;" onclick="location.reload()">Refaire un autre test</button>
+    </div>
+
+    <script>
+        let quizQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let studentName = "";
+
+        // Nettoie la saisie pour accepter les points et virgules indifféremment et enlever les espaces
+        function clean(str) {
+            return str.trim().replace(/\s+/g, '').replace('.', ',');
+        }
+
+        // Formate un nombre en remplaçant le point par une virgule pour l'affichage français
+        function formatFR(num) {
+            return num.toString().replace('.', ',');
+        }
+
+        function buildQuiz() {
+            quizQuestions = [];
+
+            // Les générateurs pour les 4 types d'opérations
+            const generators = {
+                // 1. ADDITION
+                addition: () => {
+                    const dec1 = Math.floor(Math.random() * 2) + 1; // 1 ou 2 décimales
+                    const dec2 = Math.floor(Math.random() * 2) + 1; // 1 ou 2 décimales
+                    const val1 = Math.round((Math.random() * 400 + 10) * Math.pow(10, dec1)) / Math.pow(10, dec1);
+                    const val2 = Math.round((Math.random() * 400 + 10) * Math.pow(10, dec2)) / Math.pow(10, dec2);
+                    const exactResult = Math.round((val1 + val2) * 100) / 100;
+                    
+                    return {
+                        type: "Addition",
+                        consigne: "Pose l'opération et calcule la somme exacte :",
+                        htmlContent: `${formatFR(val1)} <span class="symbol">+</span> ${formatFR(val2)}`,
+                        correctValue: formatFR(exactResult)
+                    };
+                },
+
+                // 2. SOUSTRACTION
+                subtraction: () => {
+                    const dec1 = Math.floor(Math.random() * 2) + 1;
+                    const dec2 = Math.floor(Math.random() * 2) + 1;
+                    let val1 = Math.round((Math.random() * 500 + 100) * Math.pow(10, dec1)) / Math.pow(10, dec1);
+                    let val2 = Math.round((Math.random() * 400 + 10) * Math.pow(10, dec2)) / Math.pow(10, dec2);
+                    
+                    // S'assurer que le premier nombre est plus grand
+                    if (val2 > val1) {
+                        const temp = val1;
+                        val1 = val2;
+                        val2 = temp;
+                    }
+                    const exactResult = Math.round((val1 - val2) * 100) / 100;
+
+                    return {
+                        type: "Soustraction",
+                        consigne: "Pose l'opération et calcule la différence exacte :",
+                        htmlContent: `${formatFR(val1)} <span class="symbol">−</span> ${formatFR(val2)}`,
+                        correctValue: formatFR(exactResult)
+                    };
+                },
+
+                // 3. MULTIPLICATION
+                multiplication: () => {
+                    const dec1 = Math.floor(Math.random() * 2) + 1;
+                    const val1 = Math.round((Math.random() * 440 + 10) * Math.pow(10, dec1)) / Math.pow(10, dec1);
+                    const val2 = Math.round((Math.random() * 43 + 2) * 10) / 10;
+                    const exactResult = Math.round((val1 * val2) * 1000) / 1000;
+
+                    return {
+                        type: "Multiplication",
+                        consigne: "Pose l'opération et calcule le produit exact :",
+                        htmlContent: `${formatFR(val1)} <span class="symbol">×</span> ${formatFR(val2)}`,
+                        correctValue: formatFR(exactResult)
+                    };
+                },
+
+                // 4. DIVISION (Diviseur augmenté entre 3 et 98)
+                division: () => {
+                    const decChoices = [0, 1, 2, 3];
+                    const numDecimals = decChoices[Math.floor(Math.random() * decChoices.length)];
+                    
+                    // Base de dividende de taille conséquente
+                    const baseValue = Math.floor(Math.random() * 8300) + 1200; 
+                    const dividende = baseValue / Math.pow(10, numDecimals);
+                    
+                    // Diviseur à 2 chiffres maximum : choisi aléatoirement entre 3 et 98 (exclut 10)
+                    let diviseur = 10;
+                    while (diviseur === 10) {
+                        diviseur = Math.floor(Math.random() * 96) + 3; // Génère de 3 à 98 inclus
+                    }
+                    
+                    const targetDecimals = Math.max(2, numDecimals);
+                    const exactQuotient = dividende / diviseur;
+                    const multiplier = Math.pow(10, targetDecimals);
+                    const truncatedQuotient = Math.floor(exactQuotient * multiplier + 1e-9) / multiplier;
+                    
+                    const correctValue = truncatedQuotient.toFixed(targetDecimals);
+
+                    let consigne = "";
+                    if (numDecimals === 0 || numDecimals === 1) {
+                        consigne = "Calcule la division décimale au centième";
+                    } else {
+                        consigne = "Calcule la division décimale";
+                    }
+
+                    return {
+                        type: "Division",
+                        consigne: consigne,
+                        htmlContent: `${formatFR(dividende)} <span class="symbol">÷</span> ${formatFR(diviseur)}`,
+                        correctValue: formatFR(correctValue)
+                    };
+                }
+            };
+
+            let pool = ["addition", "addition", "subtraction", "subtraction", "multiplication", "multiplication", "multiplication", "division", "division", "division"];
+            pool = pool.sort(() => 0.5 - Math.random());
+
+            for (let i = 0; i < 10; i++) {
+                const opType = pool[i];
+                quizQuestions.push(generators[opType]());
+            }
+        }
+
+        function startTest() {
+            const nameInput = document.getElementById("student-name").value.trim();
+            if (nameInput === "") {
+                alert("Veuillez entrer votre prénom et votre nom.");
+                return;
+            }
+            studentName = nameInput;
+            buildQuiz();
+            showPanel("panel-quiz");
+            loadQuestion();
+        }
+
+        function showPanel(panelId) {
+            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= 10) {
+                endTest();
+                return;
+            }
+
+            const q = quizQuestions[currentIndex];
+            document.getElementById("current-q").innerText = currentIndex + 1;
+            document.getElementById("q-consigne").innerText = q.consigne;
+            document.getElementById("q-expression-container").innerHTML = q.htmlContent;
+            
+            document.getElementById("ans-value").value = "";
+            document.getElementById("ans-value").focus();
+            
+            const progress = (currentIndex / 10) * 100;
+            document.getElementById("progress-fill").style.width = progress + "%";
+        }
+
+        function submitAnswer() {
+            const q = quizQuestions[currentIndex];
+            const userAns = document.getElementById("ans-value").value;
+            
+            if (userAns.trim() === "") {
+                alert("N'oublie pas d'entrer ta réponse.");
+                return;
+            }
+
+            q.savedDisplay = clean(userAns);
+            const isCorrect = (clean(userAns) === clean(q.correctValue));
+            q.isCorrect = isCorrect;
+            
+            if (isCorrect) score++;
+
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function skipQuestion() {
+            const q = quizQuestions[currentIndex];
+            q.isCorrect = false;
+            q.savedDisplay = "<span style='color:#64748b;'>Passée</span>";
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function endTest() {
+            showPanel("panel-results");
+            document.getElementById("res-name").innerText = studentName;
+            document.getElementById("res-grade").innerText = `${score} / 10`;
+            
+            if (score >= 8) document.getElementById("res-grade").style.color = "#2ecc71";
+            else if (score >= 5) document.getElementById("res-grade").style.color = "#e67e22";
+            else document.getElementById("res-grade").style.color = "#e74c3c";
+
+            const tableBody = document.getElementById("bilan-table-body");
+            tableBody.innerHTML = ""; 
+
+            quizQuestions.forEach(q => {
+                const row = document.createElement("tr");
+                row.className = q.isCorrect ? "row-correct" : "row-incorrect";
+
+                row.innerHTML = `
+                    <td><strong>${q.type}</strong></td>
+                    <td style="font-size:1.4em; font-weight:bold;">${q.htmlContent}</td>
+                    <td style="font-size:1.4em; font-weight:bold;">${q.savedDisplay}</td>
+                    <td style="font-size:1.4em; font-weight:bold;">${q.isCorrect ? '<span class="badge badge-success">Juste !</span>' : formatFR(q.correctValue)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        document.getElementById("ans-value").addEventListener("keyup", function(e) { 
+            if (e.key === "Enter") submitAnswer(); 
+        });
+    </script>
+</body>
+</html>
