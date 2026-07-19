@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Fractions</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --dark: #2c3e50;
+            --bg-quiz: #ebf3fc;
+            --bg-error: #ffebeb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fb;
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 650px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 25px;
+        }
+
+        /* Conteneur principal de la question */
+        .box-question {
+            background-color: var(--bg-quiz);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Conteneur de la correction */
+        .box-correction {
+            background-color: var(--bg-error);
+            border-radius: 12px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .status-title {
+            color: #c0392b;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Alignement Flexbox magique : Tout s'aligne horizontalement sur le milieu */
+        .math-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            font-size: 1.5em;
+            margin: 20px 0;
+            line-height: 1;
+        }
+
+        .text-explanation {
+            font-family: 'Segoe UI', sans-serif;
+            font-style: normal;
+            font-size: 16px;
+        }
+
+        /* Structure des fractions empilées */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .numerator {
+            border-bottom: 2px solid var(--dark);
+            padding-bottom: 3px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .denominator {
+            padding-top: 3px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>quiz-fractions</h1>
+
+    <!-- ZONE D'ÉNONCÉ -->
+    <div class="box-question">
+        <div class="math-row" id="statement-row">
+            <!-- Rempli par JavaScript -->
+        </div>
+        <div class="text-explanation" style="color: #7f8c8d; margin-top: 15px;">
+            Simplifie ta réponse si possible
+        </div>
+    </div>
+
+    <!-- ZONE DE CORRECTION -->
+    <div class="box-correction">
+        <div class="status-title">× Pas tout à fait.</div>
+        
+        <div class="math-row">
+            <span class="text-explanation">Réponse attendue : </span>
+            <div id="expected-answer"></div>
+        </div>
+        
+        <div class="math-row">
+            <span class="text-explanation">On calcule d'abord le dénominateur : </span>
+            <div id="step-1"></div>
+            <span class="text-explanation">, puis 4</span>
+        </div>
+        
+        <div class="math-row">
+            <span>÷</span>
+            <div id="step-2"></div>
+            <span>=</span>
+            <div id="step-3"></div>
+        </div>
+    </div>
+
+    <button class="btn-action" onclick="window.location.reload()">Générer une autre question</button>
+</div>
+
+<script>
+    // Génération aléatoire respectant vos critères (Entiers de minimum 2 chiffres pour les résultats)
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Création des valeurs pour l'exercice ciblé : 4 / (9/5) / 5
+    const topNum = 4;
+    const midNum = 9;
+    const midDen = 5;
+    const bottomDiv = 5;
+
+    // Calculs intermédiaires
+    // Dénominateur de la fraction principale : (9/5) ÷ 5 = 9/25
+    const denStepNum = midNum;
+    const denStepDen = midDen * bottomDiv; // 25
+
+    // Résultat final : 4 ÷ (9/25) = (4 * 25) / 9 = 100 / 9
+    const finalNum = topNum * denStepDen; // 100 (au moins 2 chiffres)
+    const finalDen = midNum; // 9
+
+    // 1. Insertion de l'énoncé de la fraction superposée
+    document.getElementById('statement-row').innerHTML = `
+        <div class="fraction">
+            <div class="numerator">
+                <div class="fraction">
+                    <div class="numerator">${topNum}</div>
+                    <div class="denominator">${midNum}</div>
+                </div>
+            </div>
+            <div class="denominator">
+                <div class="fraction">
+                    <div class="numerator">${midDen}</div>
+                    <div class="denominator">${bottomDiv}</div>
+                </div>
+            </div>
+        </div>
+        <span>= ?</span>
+    `;
+
+    // 2. Réponse attendue
+    document.getElementById('expected-answer').innerHTML = `
+        <div class="fraction">
+            <div class="numerator">${finalNum}</div>
+            <div class="denominator">${finalDen}</div>
+        </div>
+    `;
+
+    // 3. Étape 1 : calcul du dénominateur
+    document.getElementById('step-1').innerHTML = `
+        <div class="fraction">
+            <div class="numerator">${midNum}</div>
+            <div class="denominator">${midDen}</div>
+        </div>
+        <span>÷ ${bottomDiv} =</span>
+        <div class="fraction">
+            <div class="numerator">${denStepNum}</div>
+            <div class="denominator">${denStepDen}</div>
+        </div>
+    `;
+
+    // 4. Étape 2 & 3 : division finale
+    document.getElementById('step-2').innerHTML = `
+        <div class="fraction">
+            <div class="numerator">${denStepNum}</div>
+            <div class="denominator">${denStepDen}</div>
+        </div>
+    `;
+    
+    document.getElementById('step-3').innerHTML = `
+        <div class="fraction">
+            <div class="numerator">${finalNum}</div>
+            <div class="denominator">${finalDen}</div>
+        </div>
+    `;
+</script>
+
+</body>
+</html>
