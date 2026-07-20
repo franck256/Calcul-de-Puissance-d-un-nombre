@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Puissances d'un nombre</title>
+<style>
+  :root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --green:#16a34a;
+    --red:#dc2626;
+    --gray:#64748b;
+    --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg);
+    display:flex;
+    justify-content:center;
+    min-height:100vh;
+    padding:16px;
+  }
+  .app{ width:100%; max-width:480px; }
+  .card{
+    background:#fff;
+    border-radius:16px;
+    padding:24px 20px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.08);
+    margin-bottom:16px;
+  }
+  h1{ font-size:1.3rem; color:#0f172a; margin:0 0 4px; text-align:center; }
+  .subtitle{ text-align:center; color:var(--gray); font-size:0.9rem; margin-bottom:20px; }
+  label{ display:block; font-size:0.95rem; color:#334155; margin-bottom:8px; font-weight:600; }
+  input[type="text"]{
+    width:100%; padding:14px; font-size:1.1rem;
+    border:2px solid #cbd5e1; border-radius:10px; text-align:center;
+  }
+  input[type="text"]:focus{ outline:none; border-color:var(--primary); }
+  .btn{
+    display:block; width:100%; padding:16px; font-size:1.05rem; font-weight:700;
+    border:none; border-radius:12px; cursor:pointer; margin-top:14px;
+    transition:transform .05s ease, opacity .15s ease;
+  }
+  .btn:active{ transform:scale(0.98); }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-dark); }
+  .btn-secondary{ background:#e2e8f0; color:#334155; }
+  .btn-secondary:hover{ background:#cbd5e1; }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .progress-wrap{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:10px; font-size:0.85rem; color:var(--gray);
+  }
+  .progress-bar{ height:8px; background:#e2e8f0; border-radius:6px; overflow:hidden; margin-bottom:20px; }
+  .progress-fill{ height:100%; background:var(--primary); transition:width .3s ease; }
+  .score-pill{ font-weight:700; color:var(--primary); }
+
+  .question-box{
+    background:#eff6ff; border-radius:12px; padding:24px 14px;
+    text-align:center; margin-bottom:18px;
+  }
+  .expr{ font-size:1.3rem; color:#0f172a; font-weight:700; letter-spacing:0.2px; line-height:1.5; }
+  .question-title{
+    display:inline-block;
+    font-size:0.85rem; font-weight:800; letter-spacing:0.02em;
+    color:#fff; background:var(--primary);
+    padding:5px 12px; border-radius:999px;
+    margin-bottom:12px;
+  }
+  .expr sup{ font-size:0.65em; position:relative; top:-0.6em; }
+  .frac{
+    display:inline-flex; flex-direction:column; align-items:center;
+    vertical-align:middle; margin:0 8px; line-height:1.2;
+  }
+  .frac .frac-top{ padding:0 4px 4px; border-bottom:2.4px solid #0f172a; }
+  .frac .frac-bottom{ padding:4px 4px 0; }
+  .hint{ margin-top:10px; font-size:0.82rem; color:var(--gray); }
+
+  .sci-answer{
+    display:flex; align-items:flex-end; justify-content:center;
+    gap:10px; margin:10px 0 4px;
+  }
+  .field-stack{ display:flex; flex-direction:column; align-items:center; }
+  .field-label{ font-size:0.72rem; color:var(--gray); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.03em; }
+  .field-stack .field{
+    width:92px; text-align:center; font-size:1.15rem; font-weight:700;
+    padding:10px 4px; border:2px solid #cbd5e1; border-radius:8px;
+    background:#fff; color:#0f172a; cursor:pointer; min-height:1.4em;
+  }
+  .field-stack .field.active{ border-color:var(--primary); background:#eff6ff; }
+  .field-stack .field.placeholder{ color:#94a3b8; font-weight:400; }
+  .sci-times{ font-size:1.2rem; font-weight:700; color:#0f172a; padding-bottom:12px; }
+  .exp-row{ display:flex; align-items:center; gap:6px; }
+  .sign-toggle{
+    width:40px; height:40px; border-radius:8px; border:2px solid #cbd5e1;
+    background:#f8fafc; font-size:1.1rem; font-weight:700; color:#0f172a; cursor:pointer;
+  }
+  .sign-toggle.negative{ background:#fee2e2; color:var(--red); border-color:#fecaca; }
+
+  .numpad{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px; }
+  .numpad button{
+    padding:16px 0; font-size:1.2rem; font-weight:600; border:none;
+    border-radius:10px; background:#f1f5f9; color:#0f172a; cursor:pointer;
+  }
+  .numpad button:active{ background:#e2e8f0; }
+  .numpad .clear{ background:#fee2e2; color:var(--red); }
+  .numpad .switch{ font-size:0.85rem; }
+  .numpad .wide{ grid-column:span 4; }
+
+  .feedback{
+    border-radius:12px; padding:16px; margin-bottom:14px;
+    font-size:1rem; text-align:center; font-weight:600;
+  }
+  .feedback.correct{ background:#dcfce7; color:var(--green); }
+  .feedback.incorrect{ background:#fee2e2; color:var(--red); }
+  .feedback.partial{ background:#fef3c7; color:#b45309; }
+  .feedback .detail{ font-weight:400; font-size:0.88rem; margin-top:6px; color:#334155; line-height:1.5; }
+
+  .btn-row{ display:flex; gap:10px; }
+  .btn-row .btn{ margin-top:10px; }
+
+  table.recap{ width:100%; border-collapse:collapse; font-size:0.8rem; margin-top:10px; }
+  table.recap th, table.recap td{ padding:8px 4px; text-align:center; border-bottom:1px solid #e2e8f0; }
+  table.recap th{ color:var(--gray); font-weight:600; }
+  .status-ok{ color:var(--green); font-weight:700; }
+  .status-ko{ color:var(--red); font-weight:700; }
+  .status-skip{ color:var(--gray); font-weight:700; }
+
+  .hidden{ display:none; }
+  .result-score{ text-align:center; font-size:2.2rem; font-weight:800; color:var(--primary); margin:8px 0 2px; }
+  .result-sub{ text-align:center; color:var(--gray); font-size:0.9rem; margin-bottom:10px; }
+  .prop-box{
+    background:#f8fafc; border-left:4px solid var(--primary); border-radius:8px;
+    padding:10px 12px; font-size:0.84rem; color:#334155; margin-bottom:16px; line-height:1.55;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ECRAN D'ACCUEIL -->
+  <div class="card" id="screen-start">
+    <h1>Puissances d'un nombre</h1>
+    <div class="subtitle">Calculs avec des puissances de 10 (coefficients de 2 à 10)</div>
+    <label for="playerName">Ton prénom</label>
+    <input type="text" id="playerName" placeholder="Ex : Léa" autocomplete="off">
+    <div class="prop-box">
+      Exemple : (10<sup>−21</sup> × 4 × 10<sup>12</sup>) ÷ (2 × 10<sup>−22</sup>) = 2 × 10<sup>13</sup><br>
+      La réponse doit être écrite sous forme <strong>a × 10<sup>n</sup></strong>, avec 1 ⩽ a &lt; 10.<br>
+      Certains exercices demandent d'écrire un nombre sous la forme <strong>a<sup>n</sup></strong> (a le plus petit possible), ou de convertir un nombre décimal (ex : 0,009 = 9 × 10<sup>−3</sup>).
+    </div>
+    <button class="btn btn-primary" id="btn-start">Commencer (10 exercices)</button>
+  </div>
+
+  <!-- ECRAN QUESTION -->
+  <div class="card hidden" id="screen-quiz">
+    <div class="progress-wrap">
+      <span id="progress-label">Question 1/10</span>
+      <span class="score-pill" id="score-label">0 bonne(s) réponse(s)</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+
+    <div class="question-box">
+      <div class="question-title" id="question-title"></div>
+      <div class="expr" id="expr"></div>
+      <div class="hint" id="hint">Écris le résultat en écriture scientifique</div>
+    </div>
+
+    <div id="feedback-zone"></div>
+
+    <div class="sci-answer">
+      <div class="field-stack">
+        <span class="field-label" id="label-coef">coefficient</span>
+        <div class="field active" id="field-coef" data-field="coef"></div>
+      </div>
+      <span class="sci-times" id="sci-times">× 10</span>
+      <div class="field-stack">
+        <span class="field-label" id="label-exp">exposant</span>
+        <div class="exp-row">
+          <button class="sign-toggle" id="sign-toggle">+</button>
+          <div class="field" id="field-exp" data-field="exp"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="numpad" id="numpad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="4">4</button>
+      <button data-k="5">5</button><button data-k="6">6</button><button data-k="7">7</button><button data-k="8">8</button>
+      <button data-k="9">9</button><button data-k="0">0</button><button data-k=",">,</button><button class="clear" data-k="del">⌫</button>
+      <button class="switch wide" data-k="switch">coeff / exp</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btn-skip">Passer</button>
+      <button class="btn btn-primary" id="btn-validate">Valider</button>
+    </div>
+    <button class="btn btn-primary hidden" id="btn-next">Question suivante</button>
+  </div>
+
+  <!-- ECRAN RESULTATS -->
+  <div class="card hidden" id="screen-result">
+    <h1 id="result-title">Résultats</h1>
+    <div class="result-score" id="result-score">0/10</div>
+    <div class="result-sub" id="result-sub"></div>
+    <table class="recap">
+      <thead><tr><th>#</th><th>Exercice</th><th>Résultat</th></tr></thead>
+      <tbody id="recap-body"></tbody>
+    </table>
+    <button class="btn btn-primary" id="btn-restart">Recommencer</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Aléatoire sécurisé ----------
+  function randInt(min, max){
+    const range = max - min + 1;
+    const buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    return min + (buf[0] % range);
+  }
+
+  function sup(n){
+    let d = n;
+    if (typeof n === 'number' && n < 0) d = '−' + Math.abs(n);
+    return '<sup>' + d + '</sup>';
+  }
+  function frac(topHtml, bottomHtml){
+    return `<span class="frac"><span class="frac-top">${topHtml}</span><span class="frac-bottom">${bottomHtml}</span></span>`;
+  }
+
+  // c1 = c2 * k, avec k >= 2 (c1 est un vrai multiple de c2, jamais le même facteur des deux côtés)
+  function makeCoeffPair(){
+    const c2 = randInt(2,5); // au-delà, aucun multiple <=10 avec k>=2 n'existe
+    const maxK = Math.floor(10/c2);
+    const k = randInt(2, Math.max(2,maxK));
+    return { c1: c2*k, c2, result: k };
+  }
+
+  // Comparaison exacte de deux écritures a×10^e (BigInt, sans erreur d'arrondi)
+  function sciEqual(coefA, expA, coefB, expB){
+    const minExp = Math.min(expA, expB);
+    const a = BigInt(coefA) * (10n ** BigInt(expA - minExp));
+    const b = BigInt(coefB) * (10n ** BigInt(expB - minExp));
+    return a === b;
+  }
+  // Comparaison de deux écritures a×10^e avec coefficient décimal (tolérance flottante)
+  function sciDecimalEqual(coefA, expA, coefB, expB){
+    const valA = coefA * Math.pow(10, expA);
+    const valB = coefB * Math.pow(10, expB);
+    const tol = Math.max(Math.abs(valA), Math.abs(valB)) * 1e-9 + 1e-12;
+    return Math.abs(valA - valB) < tol;
+  }
+  // Construit l'écriture décimale (virgule) d'un nombre à partir de ses chiffres significatifs
+  // et de l'exposant k tel que nombre = 0.digits... x 10^(1+k) en plaçant le point après le 1er chiffre + k
+  function formatDecimal(digits, k){
+    const pointPos = 1 + k;
+    if(pointPos <= 0){
+      return `0,${'0'.repeat(-pointPos)}${digits}`;
+    } else if(pointPos >= digits.length){
+      return `${digits}${'0'.repeat(pointPos - digits.length)}`;
+    } else {
+      return `${digits.slice(0,pointPos)},${digits.slice(pointPos)}`;
+    }
+  }
+
+  // ---------- Générateurs d'exercices ----------
+  // Chaque générateur renvoie { display, coef, exp, explanation }
+  const generators = [
+
+    // A) (10^m1 x c1 x 10^m2) / (c2 x 10^m3)
+    function(){
+      const { c1, c2, result } = makeCoeffPair();
+      const m1 = randInt(-20,20), m2 = randInt(-20,20), m3 = randInt(-20,20);
+      const exp = (m1+m2) - m3;
+      return {
+        title: 'Écriture scientifique — quotient de produits',
+        display: frac(`10${sup(m1)} × ${c1} × 10${sup(m2)}`, `${c2} × 10${sup(m3)}`) + ' = ?',
+        coef: result, exp,
+        explanation: `Coefficients : ${c1} ÷ ${c2} = ${result}. Exposants : (${m1}+${m2}) − ${m3} = ${exp}. Résultat : ${result} × 10${sup(exp)}`
+      };
+    },
+
+    // B) (c1 x 10^m1) / (c2 x 10^m2)
+    function(){
+      const { c1, c2, result } = makeCoeffPair();
+      const m1 = randInt(-15,15), m2 = randInt(-15,15);
+      const exp = m1 - m2;
+      return {
+        title: 'Écriture scientifique — quotient',
+        display: frac(`${c1} × 10${sup(m1)}`, `${c2} × 10${sup(m2)}`) + ' = ?',
+        coef: result, exp,
+        explanation: `Coefficients : ${c1} ÷ ${c2} = ${result}. Exposants : ${m1} − ${m2} = ${exp}. Résultat : ${result} × 10${sup(exp)}`
+      };
+    },
+
+    // C) c1 x 10^m1 x 10^m2 (produit simple, sans division)
+    function(){
+      const c1 = randInt(2,9);
+      const m1 = randInt(-15,15), m2 = randInt(-15,15);
+      const exp = m1 + m2;
+      return {
+        title: 'Écriture scientifique — produit',
+        display: `${c1} × 10${sup(m1)} × 10${sup(m2)} = ?`,
+        coef: c1, exp,
+        explanation: `Le coefficient ne change pas : ${c1}. Exposants : ${m1} + ${m2} = ${exp}. Résultat : ${c1} × 10${sup(exp)}`
+      };
+    },
+
+    // D) écrire un nombre sous la forme a^n (a le plus petit possible)
+    function(){
+      const bases = [2,3,5,7]; // bases premières : décomposition "plus petite base" unique
+      const maxN = {2:9, 3:6, 5:4, 7:3};
+      const p = bases[randInt(0,bases.length-1)];
+      const n = randInt(2, maxN[p]);
+      const value = Math.pow(p,n);
+      return {
+        title: 'Puissance d\'un nombre',
+        display: `${value} = ?${sup('?')}`,
+        format: 'pow',
+        base: p, exp: n, value,
+        explanation: `${value} = ${p}${sup(n)} : c'est la plus petite base possible pour écrire ${value} sous forme d'une puissance.`
+      };
+    },
+    // E) écrire un nombre décimal en notation scientifique
+    function(){
+      const a0 = randInt(1,9);
+      const d = randInt(0,3);
+      let restDigits = '';
+      if(d > 0){
+        for(let i=0;i<d-1;i++) restDigits += String(randInt(0,9));
+        restDigits += String(randInt(1,9)); // dernier chiffre non nul
+      }
+      const digits = String(a0) + restDigits;
+      let k;
+      do { k = randInt(-5,5); } while(k === 0);
+      const decimalStr = formatDecimal(digits, k);
+      const coefDisplay = d > 0 ? `${a0},${restDigits}` : `${a0}`;
+      const coefValue = parseFloat(coefDisplay.replace(',','.'));
+      return {
+        title: 'Écrire le nombre décimal en notation scientifique',
+        display: `${decimalStr} = ?`,
+        format: 'decimal',
+        coef: coefValue, exp: k, coefDisplay,
+        explanation: `${decimalStr} = ${coefDisplay} × 10${sup(k)}`
+      };
+    }
+  ];
+
+  function makeExercise(){
+    const gen = generators[randInt(0, generators.length-1)];
+    return gen();
+  }
+
+  // ---------- Etat ----------
+  const TOTAL = 10;
+  let exercises = [];
+  let current = 0;
+  let correctCount = 0;
+  let skippedCount = 0;
+  let answered = false;
+  let results = [];
+  let playerName = "";
+
+  let activeField = 'coef';
+  let coefStr = "";
+  let expStr = "";
+  let negative = false;
+
+  // ---------- Elements ----------
+  const screenStart = document.getElementById('screen-start');
+  const screenQuiz = document.getElementById('screen-quiz');
+  const screenResult = document.getElementById('screen-result');
+
+  const exprEl = document.getElementById('expr');
+  const progressLabel = document.getElementById('progress-label');
+  const scoreLabel = document.getElementById('score-label');
+  const progressFill = document.getElementById('progress-fill');
+  const feedbackZone = document.getElementById('feedback-zone');
+  const btnValidate = document.getElementById('btn-validate');
+  const btnSkip = document.getElementById('btn-skip');
+  const btnNext = document.getElementById('btn-next');
+  const numpad = document.getElementById('numpad');
+  const signToggle = document.getElementById('sign-toggle');
+  const fieldCoef = document.getElementById('field-coef');
+  const fieldExp = document.getElementById('field-exp');
+  const labelCoef = document.getElementById('label-coef');
+  const labelExp = document.getElementById('label-exp');
+  const sciTimes = document.getElementById('sci-times');
+
+  document.getElementById('btn-start').addEventListener('click', startQuiz);
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    screenResult.classList.add('hidden');
+    screenStart.classList.remove('hidden');
+    document.getElementById('playerName').value = playerName;
+  });
+
+  fieldCoef.addEventListener('click', () => { if(!answered) selectField('coef'); });
+  fieldExp.addEventListener('click', () => { if(!answered) selectField('exp'); });
+  signToggle.addEventListener('click', () => {
+    if(answered) return;
+    negative = !negative;
+    updateSignUI();
+  });
+
+  numpad.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn || answered) return;
+    const k = btn.getAttribute('data-k');
+    if(k === 'switch'){
+      selectField(activeField === 'coef' ? 'exp' : 'coef');
+      return;
+    }
+    if(k === ','){
+      const ex = exercises[current];
+      if(activeField === 'coef' && ex && ex.format === 'decimal' && !coefStr.includes(',') && coefStr.length > 0){
+        coefStr += ',';
+      }
+      updateFieldsUI();
+      return;
+    }
+    if(k === 'del'){
+      if(activeField === 'coef') coefStr = coefStr.slice(0,-1);
+      else expStr = expStr.slice(0,-1);
+    } else {
+      const maxLen = (exercises[current] && exercises[current].format === 'decimal') ? 6 : 2;
+      if(activeField === 'coef'){ if(coefStr.length < maxLen) coefStr += k; }
+      else { if(expStr.length < 2) expStr += k; }
+    }
+    updateFieldsUI();
+  });
+
+  btnValidate.addEventListener('click', validateAnswer);
+  btnSkip.addEventListener('click', skipQuestion);
+  btnNext.addEventListener('click', nextQuestion);
+
+  function selectField(f){
+    activeField = f;
+    fieldCoef.classList.toggle('active', f === 'coef');
+    fieldExp.classList.toggle('active', f === 'exp');
+  }
+  function updateSignUI(){
+    signToggle.textContent = negative ? '−' : '+';
+    signToggle.classList.toggle('negative', negative);
+  }
+  function updateFieldsUI(){
+    fieldCoef.textContent = coefStr;
+    fieldCoef.classList.toggle('placeholder', coefStr === "");
+    fieldExp.textContent = expStr;
+    fieldExp.classList.toggle('placeholder', expStr === "");
+  }
+  function resetAnswerWidget(){
+    coefStr = ""; expStr = ""; negative = false;
+    activeField = 'coef';
+    updateSignUI();
+    updateFieldsUI();
+    selectField('coef');
+  }
+
+  function startQuiz(){
+    playerName = document.getElementById('playerName').value.trim() || "Élève";
+    exercises = [];
+    for(let i=0;i<TOTAL;i++) exercises.push(makeExercise());
+    current = 0;
+    correctCount = 0;
+    skippedCount = 0;
+    results = [];
+    screenStart.classList.add('hidden');
+    screenQuiz.classList.remove('hidden');
+    showQuestion();
+  }
+
+  function showQuestion(){
+    answered = false;
+    resetAnswerWidget();
+    feedbackZone.innerHTML = "";
+    btnValidate.classList.remove('hidden');
+    btnSkip.classList.remove('hidden');
+    btnNext.classList.add('hidden');
+
+    const ex = exercises[current];
+    exprEl.innerHTML = ex.display;
+    document.getElementById('question-title').textContent = ex.title || '';
+
+    const hintEl = document.getElementById('hint');
+    if(ex.format === 'pow'){
+      labelCoef.textContent = 'base (a)';
+      labelExp.textContent = 'exposant (n)';
+      sciTimes.innerHTML = '';
+      signToggle.classList.add('hidden');
+      hintEl.textContent = 'Trouve la plus petite base a possible';
+    } else if(ex.format === 'decimal'){
+      labelCoef.textContent = 'coefficient';
+      labelExp.textContent = 'exposant';
+      sciTimes.textContent = '× 10';
+      signToggle.classList.remove('hidden');
+      hintEl.textContent = 'Utilise la virgule (,) pour le coefficient si besoin';
+    } else {
+      labelCoef.textContent = 'coefficient';
+      labelExp.textContent = 'exposant';
+      sciTimes.textContent = '× 10';
+      signToggle.classList.remove('hidden');
+      hintEl.textContent = 'Écris le résultat en écriture scientifique';
+    }
+
+    progressLabel.textContent = `Question ${current+1}/${TOTAL}`;
+    scoreLabel.textContent = `${correctCount} bonne(s) réponse(s)`;
+    progressFill.style.width = `${(current/TOTAL)*100}%`;
+  }
+
+  function expectedHtmlFor(ex){
+    if(ex.format === 'pow') return `${ex.base}${sup(ex.exp)}`;
+    if(ex.format === 'decimal') return `${ex.coefDisplay} × 10${sup(ex.exp)}`;
+    return `${ex.coef} × 10${sup(ex.exp)}`;
+  }
+
+  function validateAnswer(){
+    if(answered) return;
+    if(coefStr === "" || coefStr === ","){
+      feedbackZone.innerHTML = `<div class="feedback incorrect">Remplis au moins le coefficient avant de valider.</div>`;
+      return;
+    }
+    const ex = exercises[current];
+    const isDecimal = ex.format === 'decimal';
+    const coefVal = isDecimal ? parseFloat(coefStr.replace(',','.')) : parseInt(coefStr,10);
+    if(coefVal === 0){
+      feedbackZone.innerHTML = `<div class="feedback incorrect">Le coefficient ne peut pas être 0.</div>`;
+      return;
+    }
+    const expRaw = expStr === "" ? 0 : parseInt(expStr,10);
+    const expVal = negative ? -expRaw : expRaw;
+
+    answered = true;
+    let isCorrect, feedbackClass = 'incorrect', feedbackTitle = '✗ Pas tout à fait.';
+    const expectedHtml = expectedHtmlFor(ex);
+
+    if(ex.format === 'pow'){
+      let valueMatches = false;
+      try{
+        valueMatches = (BigInt(coefVal) ** BigInt(expVal)) === BigInt(ex.value);
+      } catch(err){ valueMatches = false; }
+      const isSmallestBase = coefVal === ex.base;
+      isCorrect = valueMatches && isSmallestBase;
+      if(isCorrect){
+        feedbackClass = 'correct'; feedbackTitle = '✓ Bonne réponse !';
+      } else if(valueMatches && !isSmallestBase){
+        feedbackClass = 'partial'; feedbackTitle = "✗ C'est juste, mais ce n'est pas la plus petite base possible.";
+      }
+    } else if(isDecimal){
+      const valueMatches = sciDecimalEqual(coefVal, expVal, ex.coef, ex.exp);
+      const isNormalized = coefVal >= 1 && coefVal < 10;
+      isCorrect = valueMatches && isNormalized;
+      if(isCorrect){
+        feedbackClass = 'correct'; feedbackTitle = '✓ Bonne réponse !';
+      } else if(valueMatches && !isNormalized){
+        feedbackClass = 'partial'; feedbackTitle = '✗ Valeur correcte, mais pas en écriture scientifique (1 ⩽ a < 10).';
+      }
+    } else {
+      const valueMatches = sciEqual(coefVal, expVal, ex.coef, ex.exp);
+      const isNormalized = coefVal >= 1 && coefVal <= 9;
+      isCorrect = valueMatches && isNormalized;
+      if(isCorrect){
+        feedbackClass = 'correct'; feedbackTitle = '✓ Bonne réponse !';
+      } else if(valueMatches && !isNormalized){
+        feedbackClass = 'partial'; feedbackTitle = '✗ Valeur correcte, mais pas en écriture scientifique (1 ⩽ a ⩽ 9).';
+      }
+    }
+
+    if(isCorrect) correctCount++;
+
+    results.push({
+      display: ex.display,
+      expected: expectedHtml,
+      status: isCorrect ? 'ok' : 'ko'
+    });
+
+    feedbackZone.innerHTML = `
+      <div class="feedback ${feedbackClass}">
+        ${feedbackTitle}
+        <div class="detail">
+          Réponse attendue : ${expectedHtml}<br>
+          ${ex.explanation}
+        </div>
+      </div>`;
+
+    btnValidate.classList.add('hidden');
+    btnSkip.classList.add('hidden');
+    btnNext.classList.remove('hidden');
+    scoreLabel.textContent = `${correctCount} bonne(s) réponse(s)`;
+  }
+
+  function skipQuestion(){
+    if(answered) return;
+    answered = true;
+    skippedCount++;
+    const ex = exercises[current];
+    const expectedHtml = expectedHtmlFor(ex);
+    results.push({ display: ex.display, expected: expectedHtml, status: 'skip' });
+    feedbackZone.innerHTML = `
+      <div class="feedback" style="background:#f1f5f9;color:#334155;">
+        Question passée, ce n'est pas grave !
+        <div class="detail">La réponse était : ${expectedHtml}</div>
+      </div>`;
+    btnValidate.classList.add('hidden');
+    btnSkip.classList.add('hidden');
+    btnNext.classList.remove('hidden');
+  }
+
+  function nextQuestion(){
+    current++;
+    if(current >= TOTAL){
+      showResults();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function showResults(){
+    screenQuiz.classList.add('hidden');
+    screenResult.classList.remove('hidden');
+
+    document.getElementById('result-title').textContent = `Bravo ${playerName} !`;
+    const answeredCount = TOTAL - skippedCount;
+    document.getElementById('result-score').textContent = `${correctCount}/${answeredCount}`;
+    document.getElementById('result-sub').textContent =
+      skippedCount > 0
+        ? `${correctCount} bonne(s) réponse(s) sur ${answeredCount} question(s) traitée(s) — ${skippedCount} passée(s) (non pénalisée(s))`
+        : `${correctCount} bonne(s) réponse(s) sur ${TOTAL} questions`;
+
+    const tbody = document.getElementById('recap-body');
+    tbody.innerHTML = "";
+    results.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      let statusHtml = '';
+      if(r.status === 'ok') statusHtml = '<span class="status-ok">Correct</span>';
+      else if(r.status === 'ko') statusHtml = '<span class="status-ko">Incorrect</span>';
+      else statusHtml = '<span class="status-skip">Passé</span>';
+
+      const displayWithAnswer = r.display.replace('= ?<sup>?</sup>', `= ${r.expected}`).replace('= ?', `= ${r.expected}`);
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td style="text-align:left;">${displayWithAnswer}</td>
+        <td>${statusHtml}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  updateSignUI();
+  updateFieldsUI();
+
+})();
+</script>
+</body>
+</html>
