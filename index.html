@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul Avancé : Puissances et Décompositions Dynamiques</title>
+    <style>
+        :root {
+            --bg-color: #0b0b0c;
+            --card-bg: #16161a;
+            --accent-color: #39ff14;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
+            --border-color: #2c2c2e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 750px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .step-panel {
+            display: none;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background-color: #222227;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            color: var(--text-main);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        .question-box {
+            background-color: #1e1e24;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 35px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .math-expr {
+            font-size: 26px;
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+            margin: 25px 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .fraction .num {
+            display: block;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--text-main);
+        }
+
+        .fraction .den {
+            display: block;
+            padding-top: 6px;
+        }
+
+        sup {
+            font-size: 0.6em;
+            font-style: normal;
+            vertical-align: super;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-start, .btn-submit {
+            background-color: var(--accent-color);
+            color: #000000;
+        }
+
+        .btn-skip {
+            background-color: #2c2c2e;
+            color: #e5e5ea;
+            border: 1px solid #48484a;
+        }
+
+        .progress-bar {
+            background-color: #2c2c2e;
+            border-radius: 4px;
+            height: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .indicator {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .result-box {
+            background: #1e1e24;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin: 15px 0;
+        }
+
+        table.bilan {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        table.bilan th, table.bilan td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .row-correct { color: var(--accent-color); }
+        .row-incorrect { color: #ff453a; }
+        .row-skipped { color: #e5e5ea; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>Niveau Expert : Puissances & Décompositions</h1>
+        <div class="subtitle">Réponse sous forme la plus simple possible (Ex: 2^3*5^2 ou 3^4)</div>
+    </div>
+
+    <!-- ETAPE 1 : LOGIN -->
+    <div id="panel-login" class="step-panel" style="display: block;">
+        <label for="student-name">Nom et Prénom de l'élève :</label>
+        <input type="text" id="student-name" placeholder="Ex: Élève" autocomplete="off">
+        <button class="btn-start" style="width: 100%;" onclick="startQuiz()">Lancer la série</button>
+    </div>
+
+    <!-- ETAPE 2 : QUIZ -->
+    <div id="panel-quiz" class="step-panel">
+        <div class="indicator">Question <span id="current-q">1</span> / 5</div>
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        
+        <div class="question-box">
+            <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Simplifie au maximum l'expression suivante :</p>
+            <div class="math-expr" id="math-expression"></div>
+        </div>
+
+        <label for="user-answer">Ta réponse (Format : 2^3*5^2) :</label>
+        <input type="text" id="user-answer" placeholder="Ex: 2^4*3^-2" autocomplete="off">
+
+        <div class="btn-group">
+            <button class="btn-skip" onclick="skipQuestion()">Passer ⏭️</button>
+            <button class="btn-submit" onclick="submitAnswer()">Valider</button>
+        </div>
+    </div>
+
+    <!-- ETAPE 3 : BILAN -->
+    <div id="panel-results" class="step-panel">
+        <div class="result-box">
+            <h2>Évaluation Terminée</h2>
+            <p>Élève : <span id="res-name" style="font-weight: bold;">...</span></p>
+            <div class="score-display" id="res-grade">0 / 5</div>
+        </div>
+
+        <table class="bilan">
+            <thead>
+                <tr>
+                    <th>Calcul initial</th>
+                    <th>Ta saisie</th>
+                    <th>Correction attendue</th>
+                </tr>
+            </thead>
+            <tbody id="bilan-body"></tbody>
+        </table>
+
+        <button class="btn-start" style="width: 100%; margin-top: 25px;" onclick="window.location.reload()">Nouvelle série aléatoire</button>
+    </div>
+</div>
+
+<script>
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let studentName = "";
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Générateur de triplets (comp, f1, f2) uniques et imprévisibles
+    function generateUniqueTriplets(count) {
+        const primes = [2, 3, 5, 7, 11];
+        let pool = [];
+        
+        // Crée toutes les combinaisons possibles de produits de 2 nombres premiers distincts
+        for (let i = 0; i < primes.length; i++) {
+            for (let j = i + 1; j < primes.length; j++) {
+                pool.push({
+                    comp: primes[i] * primes[j],
+                    f1: primes[i],
+                    f2: primes[j]
+                });
+            }
+        }
+        
+        // Mélange de la liste (Algorithme de Fisher-Yates)
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        
+        return pool.slice(0, count);
+    }
+
+    function generateAdvancedQuestions() {
+        questions = [];
+        
+        // On génère 5 structures de bases totalement différentes pour cette partie
+        let tList = generateUniqueTriplets(5);
+
+        // --- EXERCICE 1 : Fraction Mixte (Produit au numérateur) ---
+        let t1 = tList[0];
+        let n1 = getRandomInt(3, 5);
+        let m1 = getRandomInt(2, 4);
+        let p1 = getRandomInt(2, 3);
+        let exp1_f1 = n1 - p1;
+        let exp1_f2 = n1 + m1;
+        questions.push({
+            html: `<div class="fraction"><span class="num">${t1.comp}<sup>${n1}</sup> &times; ${t1.f2}<sup>${m1}</sup></span><span class="den">${t1.f1}<sup>${p1}</sup></span></div>`,
+            rawText: `(${t1.comp}^${n1} * ${t1.f2}^${m1}) / ${t1.f1}^${p1}`,
+            expected: `${t1.f1}^${exp1_f1}*${t1.f2}^${exp1_f2}`
+        });
+
+        // --- EXERCICE 2 : Multiples imbriqués avec exposants aléatoires ---
+        // Choix dynamique entre base 4 (2^2), 9 (3^2), ou 25 (5^2) croisé avec un autre multiple
+        let t2 = tList[1];
+        let squareBase = t2.f1 * t2.f1; // ex: 4, 9 ou 25
+        let mixedBase = t2.f1 * t2.f2;  // ex: 6, 10, 14, 15...
+        let n2 = getRandomInt(2, 3);
+        let m2 = getRandomInt(3, 4);
+        let exp2_f1 = (2 * n2) + m2;
+        questions.push({
+            html: `${squareBase}<sup>${n2}</sup> &times; ${mixedBase}<sup>${m2}</sup>`,
+            rawText: `${squareBase}^${n2} * ${mixedBase}^${m2}`,
+            expected: `${t2.f1}^${exp2_f1}*${t2.f2}^${m2}`
+        });
+
+        // --- EXERCICE 3 : Fraction avec Produit au Dénominateur ---
+        let t3 = tList[2];
+        let n3 = getRandomInt(5, 7);
+        let m3 = getRandomInt(2, 3);
+        let p3 = getRandomInt(2, 3);
+        let exp3_f1 = n3 - m3;
+        let exp3_f2 = n3 - p3;
+        questions.push({
+            html: `<div class="fraction"><span class="num">${t3.comp}<sup>${n3}</sup></span><span class="den">${t3.f1}<sup>${m3}</sup> &times; ${t3.f2}<sup>${p3}</sup></span></div>`,
+            rawText: `${t3.comp}^${n3} / (${t3.f1}^${m3} * ${t3.f2}^${p3})`,
+            expected: `${t3.f1}^${exp3_f1}*${t3.f2}^${exp3_f2}`
+        });
+
+        // --- EXERCICE 4 : Inversion des Facteurs ---
+        let t4 = tList[3];
+        let n4 = getRandomInt(2, 4);
+        let m4 = getRandomInt(4, 6);
+        let p4 = getRandomInt(2, 3);
+        let exp4_f1 = n4 + m4;
+        let exp4_f2 = m4 - p4;
+        questions.push({
+            html: `<div class="fraction"><span class="num">${t4.f1}<sup>${n4}</sup> &times; ${t4.comp}<sup>${m4}</sup></span><span class="den">${t4.f2}<sup>${p4}</sup></span></div>`,
+            rawText: `(${t4.f1}^${n4} * ${t4.comp}^${m4}) / ${t4.f2}^${p4}`,
+            expected: `${t4.f1}^${exp4_f1}*${t4.f2}^${exp4_f2}`
+        });
+
+        // --- EXERCICE 5 : Puissance de Puissances ---
+        let t5 = tList[4];
+        let n5 = 2;
+        let m5 = getRandomInt(2, 3); 
+        let p5 = getRandomInt(2, 3);
+        let q5 = getRandomInt(2, 3);
+        let globalExp = n5 * m5;
+        let exp5_f1 = globalExp - p5;
+        let exp5_f2 = globalExp - q5;
+        questions.push({
+            html: `<div class="fraction"><span class="num">(${t5.comp}<sup>${n5}</sup>)<sup>${m5}</sup></span><span class="den">${t5.f1}<sup>${p5}</sup> &times; ${t5.f2}<sup>${q5}</sup></span></div>`,
+            rawText: `(${t5.comp}^${n5})^${m5} / (${t5.f1}^${p5} * ${t5.f2}^${q5})`,
+            expected: `${t5.f1}^${exp5_f1}*${t5.f2}^${exp5_f2}`
+        });
+    }
+
+    function startQuiz() {
+        const inputName = document.getElementById("student-name").value.trim();
+        if (!inputName) { alert("Veuillez entrer un nom."); return; }
+        studentName = inputName;
+
+        document.getElementById("panel-login").style.display = "none";
+        document.getElementById("panel-quiz").style.display = "block";
+
+        generateAdvancedQuestions();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentIndex >= questions.length) { endQuiz(); return; }
+        
+        const q = questions[currentIndex];
+        document.getElementById("current-q").innerText = currentIndex + 1;
+        document.getElementById("math-expression").innerHTML = q.html;
+        
+        const inputAns = document.getElementById("user-answer");
+        inputAns.value = "";
+        
+        setTimeout(() => inputAns.focus(), 50);
+        
+        document.getElementById("progress-fill").style.width = (currentIndex / questions.length) * 100 + "%";
+    }
+
+    function parseAndSortFactors(str) {
+        let clean = str.toLowerCase().replace(/\s+/g, "").replace(/x/g, "*").replace(/·/g, "*");
+        let factors = clean.split('*');
+        factors.sort();
+        return factors.join('*');
+    }
+
+    function submitAnswer() {
+        const q = questions[currentIndex];
+        const userAns = document.getElementById("user-answer").value.trim();
+        if (!userAns) return;
+
+        q.userAnswer = userAns;
+        if (parseAndSortFactors(userAns) === parseAndSortFactors(q.expected)) {
+            q.status = "correct";
+            score++;
+        } else {
+            q.status = "incorrect";
+        }
+
+        currentIndex++;
+        loadQuestion();
+    }
+
+    function skipQuestion() {
+        const q = questions[currentIndex];
+        q.userAnswer = "Passé ⏭️";
+        q.status = "skipped";
+
+        currentIndex++;
+        loadQuestion();
+    }
+
+    function endQuiz() {
+        document.getElementById("panel-quiz").style.display = "none";
+        document.getElementById("panel-results").style.display = "block";
+
+        document.getElementById("res-name").innerText = studentName;
+        document.getElementById("res-grade").innerText = `${score} / ${questions.length}`;
+
+        const tbody = document.getElementById("bilan-body");
+        tbody.innerHTML = "";
+
+        questions.forEach(q => {
+            const tr = document.createElement("tr");
+            if (q.status === "correct") tr.className = "row-correct";
+            else if (q.status === "skipped") tr.className = "row-skipped";
+            else tr.className = "row-incorrect";
+
+            tr.innerHTML = `
+                <td><code>${q.rawText}</code></td>
+                <td>${q.userAnswer}</td>
+                <td><strong>${q.expected}</strong></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("user-answer").addEventListener("keyup", function(e) {
+        if (e.key === "Enter") submitAnswer();
+    });
+</script>
+</body>
+</html>
